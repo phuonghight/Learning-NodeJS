@@ -13,4 +13,11 @@ const getById = {
   }),
 };
 
-module.exports = { getById, getAll };
+const changePassword = {
+  body: Joi.object().keys({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().min(8).required(),
+  }),
+};
+
+module.exports = { getById, getAll, changePassword };

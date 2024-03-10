@@ -1,5 +1,9 @@
-const { constants } = require("../constant");
+const httpStatus = require("http-status");
+const bcrypt = require("bcrypt");
+
+const { constants, messageConstant } = require("../constant");
 const prisma = require("../prisma-client");
+const ApiError = require("../utils/ApiError");
 
 const getAll = async ({ page, limit, sortBy }) => {
   page = parseInt(page) || constants.pageDefault;
@@ -79,5 +83,29 @@ const deleteById = async (id) => {
   });
   return user;
 };
+const changePasswordById = async (id, oldPassword, newPassword) => {
+  let user = await prisma.user.findUnique({ where: { id } });
+  if (!bcrypt.compareSync(oldPassword, user.password)) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      messageConstant.password.incorrect
+    );
+  }
+  user = await prisma.user.update({
+    where: { id },
+    data: {
+      password: bcrypt.hashSync(newPassword, constants.bcryptSalt),
+    },
+  });
+  delete user.password;
+  return user;
+};
 
-module.exports = { getAll, getById, getByEmail, updateById, deleteById };
+module.exports = {
+  getAll,
+  getById,
+  getByEmail,
+  updateById,
+  deleteById,
+  changePasswordById,
+};
