@@ -38,4 +38,14 @@ const register = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { login, register };
+const resetPassword = catchAsync(async (req, res, next) => {
+  await authService.resetPassword(req.body.email);
+  res.status(httpStatus.OK).json({
+    code: httpStatus.OK,
+    message: "We just have send a new password to your email. Check it now!",
+    data: null,
+    error: null,
+  });
+});
+
+module.exports = { login, register, resetPassword };
