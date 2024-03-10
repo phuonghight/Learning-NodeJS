@@ -16,5 +16,10 @@ const login = {
     password: Joi.string().min(8).required(),
   }),
 };
+const resetPassword = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+  }),
+};
 
-module.exports = { register, login };
+module.exports = { register, login, resetPassword };

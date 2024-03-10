@@ -19,6 +19,12 @@ enum Role {
   USER
 }
 
+model OTP {
+  email String @unique
+  otp String
+  deletedAt DateTime
+}
+
 model User {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now()) @map("created_at")

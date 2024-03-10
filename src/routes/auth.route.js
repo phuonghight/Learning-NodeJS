@@ -13,6 +13,7 @@ router
     upload.single(stringConstant.avatar),
     validate(authValidation.register),
     authCtrl.register
-  );
+  )
+  .post("/reset-password", validate(authValidation.resetPassword), authCtrl.resetPassword);
 
 module.exports = router;
