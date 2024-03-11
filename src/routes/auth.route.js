@@ -8,12 +8,17 @@ const { authValidation } = require("../validations");
 
 router
   .post("/login", validate(authValidation.login), authCtrl.login)
+  .post("/send-otp", validate(authValidation.sendOtp), authCtrl.sendOtp)
   .post(
     "/register",
     upload.single(stringConstant.avatar),
     validate(authValidation.register),
     authCtrl.register
   )
-  .post("/reset-password", validate(authValidation.resetPassword), authCtrl.resetPassword);
+  .post(
+    "/reset-password",
+    validate(authValidation.resetPassword),
+    authCtrl.resetPassword
+  );
 
 module.exports = router;

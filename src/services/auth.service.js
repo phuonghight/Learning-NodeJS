@@ -4,7 +4,9 @@ const bcrypt = require("bcrypt");
 const prisma = require("../prisma-client");
 const ApiError = require("../utils/ApiError");
 const { messageConstant, constants } = require("../constant");
+const otpService = require("./otp.service");
 const { sendMail } = require("./mail.service");
+const { passwordGenerator } = require("../utils/random");
 
 const login = async ({ email, password }) => {
   const user = await prisma.user.findUnique({
@@ -25,11 +27,25 @@ const login = async ({ email, password }) => {
 };
 
 const register = async ({ fullName, email, password, avatar }) => {
-  const data = { fullName, email, password, avatar };
-  data.password = bcrypt.hashSync(password, constants.bcryptSalt);
-  const user = await prisma.user.create({ data });
+  password = bcrypt.hashSync(password, constants.bcryptSalt);
+  const user = await prisma.user.create({
+    data: { fullName, email, password, avatar },
+  });
   delete user.password;
   return user;
+};
+
+const sendOtp = async (email) => {
+  const oldOtp = await otpService.getByEmail(email);
+  let otp;
+  if (oldOtp) otp = await otpService.updateOtpByEmail(email);
+  else otp = await otpService.create(email);
+  await sendMail(
+    email,
+    "Your OTP",
+    `<p>This is your OTP: <b>${otp.otp}</b></p>
+    <p>Your OTP is valid for 1 minute from the time you receive this email.</p>`
+  );
 };
 
 const resetPassword = async (email) => {
@@ -39,13 +55,7 @@ const resetPassword = async (email) => {
   if (!user)
     throw new ApiError(httpStatus.NOT_FOUND, messageConstant.notFound("Email"));
 
-  const characters =
-    "ABCDEFGHIJK0123456789LMNOPQRSTUVWXYZ0123456789abcdefghijklm0123456789nopqrstuvwxyz";
-  let newPassword = "";
-  for (let i = 0; i < 8; i++) {
-    const randomPos = ~~(Math.random() * characters.length);
-    newPassword += characters.charAt(randomPos);
-  }
+  const newPassword = passwordGenerator(constants.passwordLength);
 
   await prisma.user.update({
     where: {
@@ -63,4 +73,4 @@ const resetPassword = async (email) => {
   );
 };
 
-module.exports = { login, register, resetPassword };
+module.exports = { login, register, sendOtp, resetPassword };

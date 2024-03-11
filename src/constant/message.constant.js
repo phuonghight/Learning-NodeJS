@@ -17,6 +17,14 @@ module.exports = {
     invalid: "Invalid JWT token!",
     expired: "Expired JWT token!",
   },
+  otp: {
+    invalid: "Invalid OTP!",
+    expired: "Expired OTP!",
+  },
+  mail: {
+    success: (content) =>
+      `We just have send ${content} to your email. Check it now!`,
+  },
   required: (field) => `${field} is required!`,
   notFound: (field) => `${field} is not found!`,
 };

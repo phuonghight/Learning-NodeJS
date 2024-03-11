@@ -19,10 +19,15 @@ enum Role {
   USER
 }
 
-model OTP {
-  email String @unique
-  otp String
-  deletedAt DateTime
+model Otp {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  email     String   @unique
+  otp       Int
+  user      User?
+  deletedAt DateTime @map("deleted_at")
 }
 
 model User {
@@ -36,6 +41,7 @@ model User {
   avatar   String
   role     Role   @default(USER)
 
+  otp          Otp           @relation(fields: [email], references: [email])
   transactions Transaction[]
 
   @@map("users")

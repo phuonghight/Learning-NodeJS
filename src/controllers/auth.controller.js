@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("../utils/jwt");
-const { authService } = require("../services");
+const { authService, otpService } = require("../services");
 const { messageConstant } = require("../constant");
 
 const login = catchAsync(async (req, res, next) => {
@@ -12,6 +12,16 @@ const login = catchAsync(async (req, res, next) => {
     code: httpStatus.OK,
     message: messageConstant.status.success,
     data: { accessToken, type, user },
+    error: null,
+  });
+});
+
+const sendOtp = catchAsync(async (req, res, next) => {
+  await authService.sendOtp(req.body.email);
+  res.status(httpStatus.OK).json({
+    code: httpStatus.OK,
+    message: messageConstant.status.success,
+    data: messageConstant.mail.success("an OTP"),
     error: null,
   });
 });
@@ -28,7 +38,7 @@ const register = catchAsync(async (req, res, next) => {
       error: messageConstant.required("Avatar"),
     });
   }
-
+  await otpService.verify(data.email, data.otp);
   const newUser = await authService.register(data);
   res.status(httpStatus.OK).json({
     code: httpStatus.OK,
@@ -39,13 +49,14 @@ const register = catchAsync(async (req, res, next) => {
 });
 
 const resetPassword = catchAsync(async (req, res, next) => {
+  await otpService.verify(req.body.email, req.body.otp);
   await authService.resetPassword(req.body.email);
   res.status(httpStatus.OK).json({
     code: httpStatus.OK,
-    message: "We just have send a new password to your email. Check it now!",
+    message: messageConstant.mail.success("a new password"),
     data: null,
     error: null,
   });
 });
 
-module.exports = { login, register, resetPassword };
+module.exports = { login, register, sendOtp, resetPassword };
