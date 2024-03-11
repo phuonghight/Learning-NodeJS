@@ -12,6 +12,13 @@ prisma
     logger.info(`✅ MySQL Database is connected`);
 
     if ((await prisma.user.count()) === 0) {
+      await prisma.otp.create({
+        data: {
+          email: config.admin.email,
+          otp: 0,
+          deletedAt: new Date(),
+        },
+      });
       await prisma.user.create({
         data: {
           fullName: config.admin.fullName,

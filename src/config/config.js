@@ -19,6 +19,9 @@ module.exports = {
     email: process.env.EMAIL,
     password: process.env.PASSWORD,
   },
+  otp: {
+    exp: process.env.OTP_EXP_MINUTES,
+  },
   mail: {
     user: process.env.USER_MAIL,
     pass: process.env.PASS_MAIL,
