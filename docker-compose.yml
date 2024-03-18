@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  nodejs:
+    build: .
+    image: learning-nodejs
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    networks:
+      - nodejs-network
+
+  mysql:
+    container_name: learning-nodejs-db
+    image: mysql:8
+    environment:
+      MYSQLDB_USER: "root"
+      MYSQL_ROOT_PASSWORD: ""
+    ports:
+      - "3306:3306"
+    restart: always
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - nodejs-network
+
+volumes:
+  mysql:
+
+networks:
+  nodejs-network:
+    driver: bridge
